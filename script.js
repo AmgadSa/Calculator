@@ -1,3 +1,5 @@
+const body = document.querySelector('body');
+
 const currentExpression = document.querySelector('.new');
 
 const log = document.querySelector('.old');
@@ -38,13 +40,14 @@ const operate = (a=0,b=1,operator) => operations[operator](a || 0,b || 1);
 
 const createButtons = function(){
     let buttons = document.querySelector('.buttons');
-    let label = '1234567890.+-×/^!=xClear';
-    label = label.split('x')[0].split('').concat(label.split('x')[1]);
+    let label = '1234567890.+-×/^!=xCxAC';
+    label = label.split('x')[0].split('').concat(label.split('x').slice(1));
     for (let i = 0; i < label.length ; i++){
         let b = document.createElement('button');
         b.className = 'b' + (i+1) +' calcButton';
         b.innerText = label[i];
-        i == 18 ? b.addEventListener('click',clearScreen):
+        i == 19 ? b.addEventListener('click',clearScreen):
+        i == 18 ? b.addEventListener('click',backspace):
         i == 17 ? b.addEventListener('click',updateScreen):
         b.addEventListener('click',type);
         (0 <= i && i < 9)? digits.appendChild(b):
@@ -78,13 +81,34 @@ const type = (event)=>{
 }
 const clearScreen = ()=>{
     log.textContent = '';
-    currentExpression.textContent = '';
+    currentExpression.textContent = '0';
 }
 const updateScreen = ()=>{
     log.innerText += currentExpression.textContent+' ='+"\n";
     currentExpression.textContent = analyzeLogic(currentExpression.textContent) || 'SYNTAX ERROR';
     SCREEN_RESET = true;
     scrollScreen();
+}
+const backspace = ()=>{
+    let tail = currentExpression.textContent.split('');
+    tail.pop();
+    currentExpression.textContent = tail.join('') || '0';
+}
+const keyboardInput = (event) => {
+    let buttons = [...document.querySelectorAll('button')];
+    let newTarget = {};
+    newTarget.target = buttons.find(element =>
+        event.key === element.innerText ? true:
+        event.key === '*' && element.innerText === '×' ? true:
+        event.key === 'Enter' && element.innerText === '=' ? true:
+        event.key === 'c' && element.innerText === 'AC'? true:
+        event.key === 'Backspace'&& element.innerText === 'C'? true:
+        false);
+    !newTarget.target? false:
+    newTarget.target.innerText === '='? updateScreen():
+    newTarget.target.innerText === 'AC'? clearScreen():
+    newTarget.target.innerText === 'C'? backspace():
+    type(newTarget);
 }
 function analyzeLogic(exp = currentExpression.textContent, index = 0){
     let op = [...Object.keys(operations)],
@@ -112,3 +136,4 @@ function analyzeLogic(exp = currentExpression.textContent, index = 0){
 }
 
 createButtons();
+body.addEventListener('keydown',keyboardInput);

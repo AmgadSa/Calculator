@@ -10,8 +10,8 @@ body {
     width: 100%;
 }
 body{
-    background-color: hsl(271, 76%, 53%);
-    background-image: linear-gradient(to bottom, transparent, hsl(271, 100%, 60%));
+    background-color: hsl(266, 76%, 53%);
+    background-image: linear-gradient(to bottom, transparent, hsl(271, 100%, 65%));
     display: flex;
     flex-direction: column;
     justify-content: center;

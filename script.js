@@ -46,7 +46,6 @@ const createButtons = function(){
         b.innerText = label[i];
         i == 18 ? b.addEventListener('click',clearScreen):
         i == 17 ? b.addEventListener('click',updateScreen):
-        (10 < i && i < 16)? b.addEventListener('click',replace):
         b.addEventListener('click',type);
         (0 <= i && i < 9)? digits.appendChild(b):
         (10 < i && i <17)? symbols.appendChild(b):
@@ -56,17 +55,25 @@ const createButtons = function(){
 const scrollScreen = () => screen.scroll({top: screen.scrollHeight, behavior: 'smooth' });
 
 const type = (event)=>{
-    SCREEN_RESET ? log.innerText += currentExpression.textContent+"\n": true;
-    SCREEN_RESET ? currentExpression.textContent = '' : true;
-    currentExpression.textContent+= event.target.innerText;
+    if(/[A-Za-z]$/i.test(currentExpression.textContent) || (
+        SCREEN_RESET && /\d/i.test(event.target.innerText))){
+        log.innerText += currentExpression.textContent+"\n";
+        currentExpression.textContent = ''
+    }
+    if ((event.target.innerText == '\.' && (/\d+\.\d*$/i.test(currentExpression.textContent))) ||
+       (/\d/i.test(event.target.innerText) && /\!$/i.test(currentExpression.textContent))){
+        currentExpression.textContent+= '';
+        return true;
+    }
+    else if(/[^\d\.\!]$/i.test(currentExpression.textContent) &&
+            /[^\d\.\!]$/i.test(event.target.innerText)){
+            currentExpression.textContent = currentExpression.textContent
+            .replace(/[^\d\.]$/i,event.target.textContent)
+            return true;
+    } else {
+        currentExpression.textContent+= event.target.innerText;
+    }
     SCREEN_RESET = false;
-    scrollScreen();
-}
-const replace = (event)=>{
-    /[^\d\.\!]$/i.test(currentExpression.textContent) ? 
-    currentExpression.textContent = currentExpression.textContent
-    .replace(/[^\d\.]$/i,event.target.textContent):
-    type(event);
     scrollScreen();
 }
 const clearScreen = ()=>{
@@ -98,7 +105,7 @@ function analyzeLogic(exp = currentExpression.textContent, index = 0){
         }
         result = result.reduce((s,x)=> operate(Number(s),Number(x),op[i]))
         console.log('result: ',result);
-        return Number(result).toFixed(2);
+        return Number(Number(result).toFixed(9));
     }
     console.log('result: ',result);
     return result;

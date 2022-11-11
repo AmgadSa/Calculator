@@ -1,5 +1,15 @@
 const currentExpression = document.querySelector('.new');
+
 const log = document.querySelector('.old');
+
+const screen = document.querySelector('.screen');
+
+const digits = document.querySelector('.digits');
+
+const symbols = document.querySelector('.symbols');
+
+const extra = document.querySelector('.extra');
+
 const anyOperator = /[^\d\.]/gi;
 
 var SCREEN_RESET = false;
@@ -19,16 +29,16 @@ const factorial = a =>  (a===0) ? 1:a*factorial(a-1);
 const operations = {
     '+' : add,
     '-' : subtract,
-    '*' : multiply,
+    '×' : multiply,
     '/' : divide,
     '^' : power,
     '!' : factorial
 };
-const operate = (a=0,b=1,operator) => operations[operator](a,b);
+const operate = (a=0,b=1,operator) => operations[operator](a || 0,b || 1);
 
 const createButtons = function(){
     let buttons = document.querySelector('.buttons');
-    let label = '1234567890.+-*/^!=xClear';
+    let label = '1234567890.+-×/^!=xClear';
     label = label.split('x')[0].split('').concat(label.split('x')[1]);
     for (let i = 0; i < label.length ; i++){
         let b = document.createElement('button');
@@ -38,29 +48,36 @@ const createButtons = function(){
         i == 17 ? b.addEventListener('click',updateScreen):
         (10 < i && i < 16)? b.addEventListener('click',replace):
         b.addEventListener('click',type);
-        buttons.appendChild(b);
+        (0 <= i && i < 9)? digits.appendChild(b):
+        (10 < i && i <17)? symbols.appendChild(b):
+        extra.appendChild(b);
     }
 }
+const scrollScreen = () => screen.scroll({top: screen.scrollHeight, behavior: 'smooth' });
+
 const type = (event)=>{
     SCREEN_RESET ? log.innerText += currentExpression.textContent+"\n": true;
     SCREEN_RESET ? currentExpression.textContent = '' : true;
     currentExpression.textContent+= event.target.innerText;
     SCREEN_RESET = false;
+    scrollScreen();
 }
 const replace = (event)=>{
     /[^\d\.\!]$/i.test(currentExpression.textContent) ? 
     currentExpression.textContent = currentExpression.textContent
     .replace(/[^\d\.]$/i,event.target.textContent):
     type(event);
+    scrollScreen();
 }
 const clearScreen = ()=>{
     log.textContent = '';
     currentExpression.textContent = '';
 }
 const updateScreen = ()=>{
-    log.innerText += currentExpression.textContent+'='+"\n";
-    currentExpression.textContent = analyzeLogic(currentExpression.textContent) || 'Syntax Error!';
+    log.innerText += currentExpression.textContent+' ='+"\n";
+    currentExpression.textContent = analyzeLogic(currentExpression.textContent) || 'SYNTAX ERROR';
     SCREEN_RESET = true;
+    scrollScreen();
 }
 function analyzeLogic(exp = currentExpression.textContent, index = 0){
     let op = [...Object.keys(operations)],

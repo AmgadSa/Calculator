@@ -74,7 +74,9 @@ const type = (event)=>{
             .replace(/[^\d\.]$/i,event.target.textContent)
             return true;
     } else {
-        currentExpression.textContent+= event.target.innerText;
+        currentExpression.textContent= (currentExpression.textContent != '0') ?
+        currentExpression.textContent + event.target.innerText:
+        event.target.innerText;
     }
     SCREEN_RESET = false;
     scrollScreen();

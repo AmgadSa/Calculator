@@ -38,7 +38,7 @@ body{
 .screen{
     /* flex: 1 0 3em; */
     padding: .5em;
-    height: 28vh;
+    height: 11em;
     width: 100%;
     background-color: black;
     overflow: hidden;
@@ -91,6 +91,12 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+button:hover{
+    background-color: #333;
+}
+button:focus-visible{
+    outline: none;
 }
 .b20,.b19 {
     color: red;

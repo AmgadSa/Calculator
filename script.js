@@ -36,7 +36,7 @@ const operations = {
     '^' : power,
     '!' : factorial
 };
-const operate = (a=0,b=1,operator) => operations[operator](a || 0,b || 1);
+const operate = (a,b,operator) => operations[operator](a,b);
 
 const createButtons = function(){
     let buttons = document.querySelector('.buttons');
@@ -76,6 +76,8 @@ const type = (event)=>{
     } else {
         currentExpression.textContent= (currentExpression.textContent != '0') ?
         currentExpression.textContent + event.target.innerText:
+        (/[^\d\.\!]$/i.test(event.target.innerText)) ?
+        currentExpression.textContent + event.target.innerText:
         event.target.innerText;
     }
     SCREEN_RESET = false;
@@ -86,8 +88,10 @@ const clearScreen = ()=>{
     currentExpression.textContent = '0';
 }
 const updateScreen = ()=>{
-    log.innerText += currentExpression.textContent+' ='+"\n";
-    currentExpression.textContent = analyzeLogic(currentExpression.textContent) || 'SYNTAX ERROR';
+    log.innerText += /[^\d\.\!]$/i.test(currentExpression.textContent) ? 
+    currentExpression.textContent+'0 ='+"\n":
+    currentExpression.textContent+' ='+"\n";
+    currentExpression.textContent = analyzeLogic(currentExpression.textContent)// || 'SYNTAX ERROR';
     SCREEN_RESET = true;
     scrollScreen();
 }
